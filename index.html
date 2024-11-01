@@ -81,13 +81,9 @@
             debugger
         }
 
-        function addRemoteVideo(stream) {
-            let videoRemote = document.createElement("video");
-            videoRemote.classList.add("video")
-            videoRemote.srcObject = stream;
-            videoRemote.play()
-            console.log("addRemoteVideo " + videoRemote)
-            document.getElementById("remoteVideo").append(videoRemote)
+        function addRemoteVideo(stream) { 
+            
+            document.getElementById("remoteVideo").append(stream)
             var document = document.getElementById("remoteVideo")
             console.log(document)
             debugger
