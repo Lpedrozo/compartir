@@ -2,33 +2,102 @@
 
 <head>
     <title>Delta Meet</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
-
+<style>
+    .video {
+        height: 400px;
+        width: 300px;
+    }
+</style>
 <body>
-    <h1 class="title">Delta Meet</h1>
-    <p id="notification" hidden></p>
-    <div class="entry-modal" id="entry-modal">
-        <p>Create or Join Meeting</p>
-        <input id="room-input" class="room-input" placeholder="Enter Room ID">
-        <div>
-            <button onclick="createRoom()">Create Room</button>
-            <button onclick="joinRoom()">Join Room</button>
+    <h3 id="show-peer"></h3>
+    <div style="display: flex; justify-content: space-around; margin:10px">
+        <div style="width: 400px; height: 300px; border: 2px solid;" id="ourVideo">
+            Our Video
+        </div>
+        <div style="width: 400px; height: 300px; border: 2px solid;" id="remoteVideo">
+            Remote Video
         </div>
     </div>
-    <div class="meet-area">
-        <!-- Remote Video Element-->
-        <video id="remote-video"></video>
-
-        <!-- Local Video Element-->
-        <video id="local-video"></video>
-        <div class="meet-controls-bar">
-            <button onclick="startScreenShare()">Screen Share</button>
-        </div>
-    </div>
+    <input id="peerID" placeholder="Peer ID" />
+    <button id="call-peer">Call Peer</button>
+    <br />
 </body>
 
-<script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
-<script src="script.js"></script>
-
 </html>
+<script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+<script>
+    window.addEventListener("load", (event) => {
+        var peer = new Peer();
+        var myStream;
+        var peerList = [];
+        peer.on("open", function (id) {
+            document.getElementById("show-peer").innerHTML = id
+        })
+        peer.on("call", function (call) {
+            navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true
+            }).then((stream) => {
+                myStream = stream
+                addOurVideo(stream)
+                call.answer(stream)
+                call.on("stream", function (remoteStream) {
+                    if (!peerList.includes(call.peer)) {
+                        addRemoteVideo(remoteStream)
+                        peerList.push(call.peer)
+                        debugger
+                    }
+                })
+            }).catch((err) => {
+                console.log(err + "unable to got media.")
+            })
+            debugger
+        })
+
+        document.getElementById("call-peer").addEventListener("click", (e) => {
+            let remotePeerId = document.getElementById("peerID").value;
+            document.getElementById("show-peer").innerHTML = "conneting" + remotePeerId;
+            callPeer(remotePeerId);
+        })
+
+        function callPeer(id) {
+            navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true
+            }).then((stream) => {
+                myStream = stream
+                console.log("CallPeer " + myStream)
+                addOurVideo(stream)
+                let call = peer.call(id, stream)
+                call.on("stream", function (remoteStream) {
+                    addRemoteVideo(remoteStream)
+                    debugger
+                }
+                )
+            }).catch((err) => {
+                console.log(err + "enable to get media.")
+            })
+            debugger
+        }
+
+        function addRemoteVideo(stream) {
+            let videoRemote = document.createElement("video");
+            videoRemote.classList.add("video")
+            videoRemote.srcObject = stream;
+            videoRemote.play()
+            console.log("addRemoteVideo " + videoRemote)
+            document.getElementById("remoteVideo").append(videoRemote)
+            debugger
+        }
+
+        function addOurVideo(stream) {
+            let video = document.createElement("video");
+            video.classList.add("video")
+            video.srcObject = stream;
+            video.play()
+            document.getElementById("ourVideo").append(video)
+            debugger
+        }
+    })
+</script>
