@@ -72,6 +72,7 @@
                 let call = peer.call(id, stream)
                 call.on("stream", function (remoteStream) {
                     addRemoteVideo(remoteStream)
+                    console.log("Ya llamo a la funcion dentro d callPeer")
                     debugger
                 }
                 )
@@ -86,6 +87,7 @@
             videoRemote.classList.add("video")
             videoRemote.srcObject = stream;
             videoRemote.play()
+            console.log(videoRemote)
             document.getElementById("remoteVideo").append(videoRemote)
             debugger
         }
