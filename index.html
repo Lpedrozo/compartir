@@ -83,8 +83,9 @@
 
         function addRemoteVideo(stream) { 
             
+
             var documents = document.getElementById("remoteVideo")
-            documents.append(stream)
+            documents.srcObject = stream
             console.log(document)
             debugger
         }
